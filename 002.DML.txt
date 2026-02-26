@@ -1,0 +1,92 @@
+INSERT INTO customer (name, email) VALUES
+('Juan Pérez', 'juan.perez@email.com'),
+('María Gómez', 'maria.gomez@email.com'),
+('Carlos López', 'carlos.lopez@email.com'),
+('Ana Martínez', 'ana.martinez@email.com'),
+('Luis Rodríguez', 'luis.rodriguez@email.com');
+
+
+INSERT INTO seller (name, email) VALUES
+('DigitalTemplates Pro', 'contact@digitaltemplates.co'),
+('AuditExpert Solutions', 'info@auditeexpert.com'),
+('MentorHub Academy', 'partners@mentorhub.co');
+
+
+INSERT INTO categories (name) VALUES
+('Plantillas'),
+('Auditorías'),
+('Mentorías'),
+('Paquetes'),
+('Cursos');
+
+
+INSERT INTO product (name, price, seller_id, category_id) VALUES
+('Plantilla Web React', 45000, 1, 1),
+('Plantilla E-commerce', 65000, 1, 1),
+('Auditoría SEO Completa', 120000, 2, 2),
+('Auditoría Performance', 95000, 2, 2),
+('Mentoría React Avanzada', 250000, 3, 3),
+('Mentoría Node.js', 180000, 3, 3),
+('Paquete Web Completo', 850000, 1, 4),
+('Paquete Auditoría + Mentoría', 350000, 2, 4),
+('Curso React Completo', 150000, 3, 5),
+('Curso PostgreSQL Admin', 120000, 2, 5);
+
+INSERT INTO orders (customer_id, from_status, to_status, amount) VALUES
+(1, NULL,'CREATED',45000.00),  -- Pedido #1: Plantilla React
+(1, 'CREATED','PAID',65000.00),  -- Pedido #5: E-commerce
+(2, NULL,'PAID',185000.00), -- Pedido #2: Mix productos
+(2, 'PAID','IN_PROGRESS',120000.00), -- Pedido #7: Curso Postgres
+(3, NULL,'IN_PROGRESS',250000.00), -- Pedido #3: Mentoría React
+(3, 'CREATED','CANCELED',85000.00),  -- Pedido #8: Cancelado
+(4, NULL,'DELIVERED',120000.00), -- Pedido #4: Auditoría
+(5, 'PAID','DELIVERED',850000.00); -- Pedido #6: Paquete completo
+
+
+INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES
+(1, 1, 1, 45000),
+(2, 1, 1, 45000), 
+(2, 3, 1, 120000), 
+(2, 9, 1, 20000),
+(3, 5, 1, 250000),
+(4, 4, 1, 120000),
+(5, 2, 1, 65000),
+(6, 7, 1, 850000),
+(7, 10, 1, 120000);
+
+INSERT INTO payments (order_id,status,amount) VALUES
+(9,'APPROVED', 45000),
+(2,'APPROVED', 185000),
+(2,'FAILED', 185000),
+(3,'PENDING', 250000),
+(3,'FAILED', 250000),
+(4,'APPROVED', 120000),
+(5,'FAILED', 65000),
+(6,'APPROVED', 850000),
+(7,'PENDING', 120000),
+(8,'REFUNDED', 0);
+
+
+
+INSERT INTO fulfillments (order_id, created_at, finish_at) VALUES
+(1, '2026-02-20', '2026-02-21'),  
+(2, '2026-02-21', '2026-02-28'),  
+(3, '2026-02-22', '2026-03-05'),  
+(4, '2026-02-22', '2026-02-24'),  
+(5, '2026-02-23', '2026-03-01'),  
+(6, '2026-02-23', '2026-02-27'),  
+(7, '2026-02-24', '2026-03-10'), 
+(8, '2026-02-22', '2026-02-22');
+
+
+INSERT INTO order_status_history (order_id, from_status, to_status, changed_by) VALUES
+(5, NULL, 'CREATED', 'system'),
+(5, 'CREATED', 'PAID', 'payment_system'),
+(5, 'PAID', 'IN_PROGRESS', 'fulfillment'),
+(5, 'IN_PROGRESS', 'DELIVERED', 'seller_1'),
+(2, NULL, 'CREATED', 'system'),
+(2, 'CREATED', 'PAID', 'payment_system'),
+(3, NULL, 'CREATED', 'system'),
+(4, NULL, 'CREATED', 'system'),
+(4, 'CREATED', 'PAID', 'payment_system'),
+(4, 'PAID', 'DELIVERED', 'seller_2');

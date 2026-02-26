@@ -1,0 +1,109 @@
+select * from orders
+select * from order_items
+select * from customer
+select * from product
+select * from payments
+select * from seller
+select * from order_status_history
+
+
+
+select c.name as client, o.id as pedido, o.amount as vendido from customer c
+inner join orders o on c.id = o.customer_id;
+
+
+--1 . RESUMEN PEDIDO
+select  cu.name as vendedor, p.name as NombreProducto, o.quantity as Cantidad,o.subtotal as Pagar from product p
+inner join order_items o on p.id = o.product_id
+inner join customer cu on cu.id = p.seller_id
+
+
+--2. 3 PRODUCTOS MAS VENDIDOS
+
+select
+    p.name as NombreProducto,
+    count(*) as veces_vendido,
+    sum(oi.quantity) as unidades_totales,
+    sum(oi.subtotal) as totalVentas
+from order_items oi
+inner join product p on p.id = oi.product_id
+group by oi.product_id,NombreProducto
+order by unidades_totales desc, totalVentas desc
+LIMIT 3;
+
+--3 TOP SELLERS POR INGRESO APROBADO
+
+select
+    s.name as vendedor,
+    sum(oi.subtotal) as ventas
+from seller s   
+inner join product p on s.id = p.seller_id
+inner join order_items oi on p.id = oi.product_id
+inner join payments pay on pay.order_id = oi.order_id
+where pay.status = 'APPROVED'
+group by vendedor
+order by ventas desc
+
+
+--4 Clientes Frecuentes
+
+select
+    cu.name as client,
+    pay.amount as Valor_venta
+
+from customer cu
+inner join orders o on cu.id = o.customer_id
+inner join payments pay on pay.order_id = o.id
+where pay.status = 'APPROVED'
+order by valor_venta desc
+
+
+-- 5 Pedidos Inconsistentes
+
+select
+    o.id as id_orden,
+    o.to_status as estado,
+    pay.status as estado_pago
+
+from orders o
+inner join payments pay on pay.order_id = o.id
+where pay.status != 'APPROVED' AND o.to_status = 'PAID'
+
+select
+    pay.order_id as orden_id,
+    pay.status as estado,
+    o.to_status as pago
+from payments pay
+inner join orders o on pay.order_id = o.id
+where pay.status = 'APPROVED' and o.to_status != 'PAID'
+ 
+SELECT 
+    order_id, to_status, ranking --subconsulta que genero
+FROM (
+    SELECT 
+        order_id,
+        to_status,
+        CASE to_status                    --utilizo case para agregar un valor segun el dato
+            WHEN 'DELIVERED' THEN 1       -- Final (mejor)
+            WHEN 'IN_PROGRESS' THEN 2
+            WHEN 'PAID' THEN 3
+            WHEN 'CREATED' THEN 4         -- Inicio (peor)
+            ELSE 99
+        END AS ranking,                     -- termino la subconsulta y le doy un alias 
+        ROW_NUMBER() OVER(                  --me agrega los "mejores de cada linea de consulta y lo ordenamos de menor"
+            PARTITION BY order_id           --" a mayor y me inserte el dato menor
+            ORDER BY 
+                CASE to_status            -- Orden: MENOR=mejor
+                    WHEN 'DELIVERED' THEN 1
+                    WHEN 'IN_PROGRESS' THEN 2
+                    WHEN 'PAID' THEN 3
+                    WHEN 'CREATED' THEN 4
+                    ELSE 99
+                END ASC                   -- ASC = 1 primero
+        ) AS maxi
+    FROM order_status_history
+) ranking
+WHERE maxi = 1;                        -- ← SIEMPRE el #1 (mejor)
+                   -- ← rn=1 = MEJOR (mayor avance)
+
+
