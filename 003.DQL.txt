@@ -13,7 +13,7 @@ inner join orders o on c.id = o.customer_id;
 
 
 --1 . RESUMEN PEDIDO
-select  cu.name as vendedor, p.name as NombreProducto, o.quantity as Cantidad,o.subtotal as Pagar from product p
+select  cu.name as Client, p.name as NombreProducto, o.quantity as Cantidad,o.subtotal as Pagar from product p
 inner join order_items o on p.id = o.product_id
 inner join customer cu on cu.id = p.seller_id
 
